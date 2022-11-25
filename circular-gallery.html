@@ -1,0 +1,448 @@
+<!--This project is a fork. Credits to the author of the initial code: https://github.com/an-object-is-a-->
+
+<!--For any questions you can find me here: https://github.com/david-paun-->
+<style>
+    
+        #gallery-body {
+            margin: 0;
+            padding: 0;
+            /*width: 50vw;*/
+            height: 100vh;
+            overflow: hidden;
+            	flex: 60%;
+            	position: relative;
+        }
+        #textwrapper{
+			margin: 0;
+            padding: 0;
+            /*width: 50vw;*/
+            height: 100vh;
+            overflow: hidden;
+            	flex: 40%;
+			position: relative;
+			}
+
+        .wheel {
+            width: 11vw;
+            height: 11vw;
+            //border: solid 20px hsla(0,0%,100%,.45);
+			border-radius: 300px;
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .card {
+            /* width: 90px;
+            height: 50px;
+            background-color: red; */
+            border-radius: 250px!important;
+
+            
+            width: 11vw;
+            height: 11vw;
+            /*box-shadow: 10px 10px 8px white;*/
+            
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+
+            font-size: 2.5em;
+            
+        }
+        
+        #wrapper{
+			background-color: #11121d;
+			display: flex;
+			flex-wrap: wrap;
+			overflow: hidden!important;
+			margin: 0;
+			padding: 0;
+			width: 100vw;
+			height: 100vh;
+			position: absolute;
+			}
+			html, body{
+				height: 100%;
+				margin:0;
+				padding:0;
+				overflow: hidden;
+				}
+		#textbox{
+			position: absolute;
+			top: 45%;
+			left: 0%;
+			transform: translate(-0%, -45%);
+			font-family: "Share Tech Mono", Sans-serif;
+			color: #F9F6ED;
+			font-size: 1.2vw;
+			line-height: 1.7vw;
+			padding-right: 5vw;
+
+			}
+			
+    @media screen and (max-width: 1366px) {
+        .wheel {
+            width: 15vw;
+            height: 15vw;
+          }
+        .card {
+            width: 15vw;
+            height: 15vw;
+        }
+        	#textbox{
+        	    padding-right: 5vw;
+        	    	font-size: 1.4vw;
+			line-height: 1.9vw;
+        	}
+
+}
+    @media screen and (max-width: 1024px) {
+        #gallery-body{
+            	flex: 100%;
+            	height: 60vh;
+        }
+        #textwrapper{
+            	flex: 100%;
+            	height: 20vh;
+        }
+        #textbox{
+			top: 40%;
+			left: 50%;
+			transform: translate(-50%, -40%);
+			font-size: 2.2vw;
+			line-height: 2.8vw;
+			padding-right: 0;
+			text-align: center;
+		}
+		 .card {
+            width: 19vw;
+            height: 19vw;
+        }
+          .wheel {
+            width: 19vw;
+            height: 19vw;
+          }
+
+}
+    @media screen and (max-width: 767px) {
+        #textbox{
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			font-size: 4vw;
+			line-height: 5vw;
+			margin: 0;
+			padding: 0;
+			width: 80%;
+			text-align: center;
+		}
+         #gallery-body{
+            	flex: 100%;
+            	height: 50vh;
+        }
+        #textwrapper{
+            	flex: 100%;
+            	height: 30vh;
+        }
+         .card {
+            width: 21vw;
+            height: 21vw;
+        }
+          .wheel {
+            width: 21vw;
+            height: 21vw;
+          }
+}
+			
+</style>
+
+
+<div id="wrapper">
+	<div id='gallery-body'>
+		<div class="wheel">
+			<img src="./upwork.png" id="0" class="card" onclick="snap_back(0)">
+			<img src="./mail.png" id="1" class="card" onclick="snap_back(1)">
+			<img src="./github.png" id="2" class="card" onclick="snap_back(2)">
+			<img src="./linkedin.png" id="3" class="card" onclick="snap_back(3)">
+		</div>
+    </div>
+    
+    <div id='textwrapper'>
+		<div id="textbox">
+		</div>
+    </div>
+ 
+ </div>
+    <script>
+		//for each entry make sure to create an appropriate content string following the naming convention -> content_${idOfTheElement}
+		content_0="sample content 0";
+		content_1="sample content 1";
+		content_2="sample content 2";
+		content_3="sample content 3";
+		content_4="...";
+		content_5="...";
+		content_6="...";
+		content_7="...";
+		content_8="...";
+		content_9="...";
+		
+		let FOCUS_POSITION = 0; // from 0 to (elemets.length -1) , 0 is 3 o clock and counting is counter-clockwise
+		let INIT_FLAG = true; //if set to true makes sure that one of the options is selected on page load
+		let NUMBER_OF_ENTRIES = 4; //number of pictures in the gallery
+		let WHEEL_RADIUS = (window.innerWidth+900)*0.06; //this has been modified to accomodate the fact that smaller screens need to have a lower wheel radius compared to bigger screens
+		let SCROLL_SPEED = 30;
+		let INIT_ANIMATION=1; //set to zero to disable animation on load
+		
+        let theta = 2 * Math.PI / NUMBER_OF_ENTRIES; // angle taken by each of the entries. 360deg=2PI -> theta= 2PI/NUMBER_OF_ENTRIES
+        let new_theta = 0.0;
+        let new_x = 0.0;
+        let new_y = 0.0;
+        let wheel_radius = WHEEL_RADIUS;
+        let wheel_theta = 0.0;
+        const cards = document.querySelectorAll('.card');
+        const wheel = document.querySelector('.wheel');
+        const center = {
+            x: parseFloat(getComputedStyle(cards[0]).left),
+            y: parseFloat(getComputedStyle(cards[0]).top)
+        }
+
+
+        cards.forEach((card, index) => {
+            new_theta = theta * index;
+            new_x = (Math.cos(new_theta) * wheel_radius);
+            new_y = (-1.0 * Math.sin(new_theta) * wheel_radius);
+
+            // place the cards on the wheel
+            card.style.left = `${center.x + new_x}px`;
+            card.style.top = `${center.y + new_y}px`;
+        });
+
+        let wheel_in_progress = false;
+        let snap_in_progress = false;
+
+        document.addEventListener('wheel', event => {
+            if (snap_in_progress) {
+                return;
+            } else {
+                clearTimeout(wheel_in_progress);
+                // let scroll_speed = event.deltaY * 0.002;
+                let scroll_speed = (event.deltaY / 360) * SCROLL_SPEED;
+
+                wheel_theta = wheel_theta + scroll_speed;
+                wheel.style.transitionDelay = '0.0s';
+                wheel.style.transitionDuration = '0.0s';
+                wheel.style.transform = `translate(-50%, -50%) rotate(${wheel_theta}deg)`;
+
+                cards.forEach(card => {
+                    card.style.transitionDelay = '0.0s';
+                    card.style.transitionDuration = '0.0s';
+                    card.style.transform = `translate(-50%, -50%) rotate(${-1.0 * wheel_theta}deg)`;
+                });
+
+                wheel_in_progress = setTimeout(() => {
+                    snap_back(-1);
+                }, 100)
+            }
+        });
+   
+
+        const center_of_wheel = {
+            x: parseFloat(getComputedStyle(wheel).left),
+            y: parseFloat(getComputedStyle(wheel).top)
+        }
+
+        const snap_point = {
+            x: cards[FOCUS_POSITION].getBoundingClientRect().x + 100,
+            y: cards[FOCUS_POSITION].getBoundingClientRect().y + 100
+        }
+        snap_point.theta = Math.atan2(Math.abs(snap_point.y - center_of_wheel.y), Math.abs(snap_point.x - center_of_wheel.x));
+        snap_point.theta = snap_point.theta * (180 / Math.PI);
+
+        let closest_card = cards[FOCUS_POSITION];
+        
+        let previous_selected_index = 0;
+
+        function snap_back(element_id) {
+            snap_in_progress = true;
+            let shortest_distance = Math.pow(((cards[FOCUS_POSITION].getBoundingClientRect().x + 100) - snap_point.x), 2) + Math.pow(((cards[FOCUS_POSITION].getBoundingClientRect().y + 100) - snap_point.y), 2);
+            shortest_distance = Math.sqrt(shortest_distance);
+            
+            //if the page is being loaded
+            if(INIT_FLAG==true){
+                INIT_FLAG=false;
+            }
+            //if the user is scrolling through the gallery
+				//id=-1 means that no element is actually clicked
+            else if(INIT_FLAG==false && element_id==-1){
+
+            cards.forEach((card, index) => {
+                let dx = (card.getBoundingClientRect().x + 100) - snap_point.x;
+                let dy = (card.getBoundingClientRect().y + 100) - snap_point.y;
+                let current_distance = Math.pow(dx, 2) + Math.pow(dy, 2);
+                current_distance = Math.sqrt(current_distance)
+
+                if (shortest_distance >= current_distance) {
+                    shortest_distance = current_distance;
+                    closest_card = card;
+                }
+            });
+            
+            //else the user must have clicked on an element whose id is found as a parameter of this function
+            }
+            else{
+                closest_card = cards[element_id];
+                
+                let dx = (closest_card.getBoundingClientRect().x + 100) - snap_point.x;
+                let dy = (closest_card.getBoundingClientRect().y + 100) - snap_point.y;
+                let current_distance = Math.pow(dx, 2) + Math.pow(dy, 2);
+                current_distance = Math.sqrt(current_distance)
+                shortest_distance=current_distance;
+            }
+            
+            textBoxUpdate(closest_card.id);
+
+            let closest_cards_x = closest_card.getBoundingClientRect().x + 100;
+            let closest_cards_y = closest_card.getBoundingClientRect().y + 100;
+
+            let closest_cards_theta = Math.atan2(Math.abs(closest_cards_y - center_of_wheel.y), Math.abs(closest_cards_x - center_of_wheel.x));
+            closest_cards_theta = closest_cards_theta * (180 / Math.PI);
+            
+            let theta_between = 0;
+            
+                theta_between = Math.abs(closest_cards_theta - snap_point.theta
+                    );         
+
+            // make a positive or negative degree shift
+            if (closest_cards_x > center_of_wheel.x && closest_cards_y <= center_of_wheel.y) { // QI
+                theta_between = closest_cards_theta > snap_point.theta ? theta_between : -1.0 * theta_between;
+            } else if (closest_cards_x <= center_of_wheel.x && closest_cards_y <= center_of_wheel.y) { // QII
+                theta_between = closest_cards_theta > snap_point.theta ? -1.0 * theta_between : theta_between;
+            } else if (closest_cards_x <= center_of_wheel.x && closest_cards_y > center_of_wheel.y) { // QIII
+                theta_between = closest_cards_theta > snap_point.theta ? theta_between : -1.0 * theta_between;
+            } else if (closest_cards_x > center_of_wheel.x && closest_cards_y >= center_of_wheel.y) { // QIV
+                theta_between = closest_cards_theta > snap_point.theta ? -1.0 * theta_between : theta_between;
+            }
+            
+            //this covers the case where it is not the initial loading of the page and some of the entries are CLICKED by the user
+            if(INIT_FLAG==false && element_id!=-1){
+                let offset_multiplier=calcJumps(closest_card.id,previous_selected_index); //offset_multiplier depends on how far the clicked element is from the previously focused one
+                
+                //how many jumps = offset_multiplier
+                //how many degrees is needed for each jump = 2 * Math.PI / NUMBER_OF_ENTRIES
+                //180/pi is for conversion from radians to degrees
+                 wheel_theta += offset_multiplier * 2 * Math.PI / NUMBER_OF_ENTRIES * (180 / Math.PI);
+                 wheel.style.transitionDelay = '0.0s';
+                 wheel.style.transitionDuration = '0.5s';
+                 wheel.style.transform = `translate(-50%, -50%) rotate(${wheel_theta}deg)`;
+
+                 cards.forEach(card => {
+                     card.style.transitionDelay = '0.0s'; //0.1?
+                     card.style.transitionDuration = '0.5s'; //1.0?
+                     if(card.id==element_id){
+                 card.style.transform = `translate(-50%, -50%) rotate(${-1.0 * wheel_theta}deg) scale(1.0)`;
+                     }
+                     else{
+                          card.style.transform = `translate(-50%, -50%) rotate(${-1.0 * wheel_theta}deg) scale(0.8)`;
+                     }
+                 });
+            }
+            
+            //else either the user is scrolling or the page is loading which still means that we have to spin the gallery to the element that is focused by default
+            else{
+                
+            wheel.style.transitionDelay = '0.0s';
+            wheel.style.transitionDuration = '0.5s';
+            wheel.style.transform = `translate(-50%, -50%) rotate(${wheel_theta + theta_between}deg)`;
+
+            cards.forEach(card => {
+                card.style.transitionDelay = '0.0s';
+                card.style.transitionDuration = '0.5s'
+
+                if (closest_card == card) {
+                    card.style.transform = `translate(-50%, -50%) rotate(${-1.0 * (wheel_theta + theta_between)}deg) scale(1.0)`;
+                    card.style.zIndex = 100;
+                } else {
+                    card.style.transform = `translate(-50%, -50%) rotate(${-1.0 * (wheel_theta + theta_between)}deg) scale(0.8)`;
+                    card.style.zIndex = 1;
+                }
+            });
+
+            wheel_theta = wheel_theta + theta_between;
+            
+            }
+            
+            //we have to keep track of the currently selected element in case the user make a click-intercation next time
+            previous_selected_index = closest_card.id;
+            
+            
+           highlightSelectedOnly(closest_card);
+
+            setTimeout(() => {
+                snap_in_progress = false;
+            }, 200);
+            
+        }
+        
+        //calculates the amount of jumps the CLICKED element has to make in a clockwise manner in order to land on the focused position
+        function calcJumps(curr, prev){
+            var jumps=0;
+            var current=curr;
+            var previous=prev;
+            
+            if(current==previous) return 0;
+            
+            for(var i=0;i<NUMBER_OF_ENTRIES-1;i++){
+                jumps++;
+                previous++;
+                if( (previous%NUMBER_OF_ENTRIES) == current) return jumps;
+            }
+            return -1;
+            
+        }
+        
+        //makes the initial load animation, can be toggled by the appropirate global variable
+        function initFlip(){
+			if(INIT_ANIMATION==0) return;
+			
+            wheel_theta = 360;
+                 
+                 wheel.style.transitionDelay = '1.0s';
+                 wheel.style.transitionDuration = '1.5s';
+                 wheel.style.transform = `translate(-50%, -50%) rotate(${wheel_theta}deg)`;
+
+                 cards.forEach(card => {
+                     card.style.transitionDelay = '1.0s'; //0.1?
+                     card.style.transitionDuration = '1.5s'; //1.0?
+                     
+                     if(card == cards[FOCUS_POSITION]){
+                         card.style.transform = `translate(-50%, -50%) rotate(360deg) scale(1.0)`;
+                     }
+                     else{
+                     card.style.transform = `translate(-50%, -50%) rotate(${-1.0 * wheel_theta}deg) scale(1.0)`;
+                     }
+                     
+                 });
+                 
+                 snap_back(-1);
+            
+        }
+        
+        function highlightSelectedOnly(highlighted_card){
+            for(i=0;i<cards.length;i++){
+                if(cards[i].id==highlighted_card.id)
+                    cards[i].style.opacity = 1;
+                else
+                    cards[i].style.opacity = 0.7;
+            }
+        }
+        
+        function textBoxUpdate(id){
+			document.getElementById("textbox").innerHTML = window["content_"+id];
+			}
+			
+			document.addEventListener("load", initFlip());
+			document.addEventListener("load", snap_back(-1));
+    </script>
