@@ -27,7 +27,11 @@ gallery entries are styled dynamically based on whether they are currently in fo
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 If you need help in uderstanding some of the math and structure of the JavaScript code start by reffering to the YouTube videos of the original creator:
+
 Original Creator's Initial video: https://www.youtube.com/watch?v=boTzMxNn7UE&t=0s
+
 Original Creator's Improved video: https://www.youtube.com/watch?v=w_t-y_kKGoY&t=211s
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 If you have any questions about the added functionalities in this fork feel free to reach out! :)
