@@ -3,7 +3,7 @@ A fork of an HTML/JS/CSS Advanced Spinning Wheel Carousel
 I created this for the purpose of my own portfolio website. You can see a live implementation of it here: https://david.mvisionhost.com/contact-me/
 
 I tried to make some of the functionalities dynamic in nature so that a future user can modify/remove them by tweaking global variables individually
-
+ 
 Here's a list of fuctionalities that were added:
  -added a content section to the right of the gallery that updates dynamically based on user interaction with the wheel
  -added a back-end global variable to dynamically set the amount of entires in the gallery and made sure that the rest of the logic adjusts to this dynamically
