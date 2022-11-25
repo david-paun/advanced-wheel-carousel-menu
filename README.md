@@ -4,7 +4,7 @@ I created this for the purpose of my own portfolio website. You can see a live i
 
 I tried to make some of the functionalities dynamic in nature so that a future user can modify/remove them by tweaking global variables individually
 
-
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Here's a list of fuctionalities that were added:
 
@@ -24,8 +24,7 @@ changed the logic of the main spinning function as well as the onLoad trigger to
 
 gallery entries are styled dynamically based on whether they are currently in focus or not
 
-
-
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 If you need help in uderstanding some of the math and structure of the JavaScript code start by reffering to the YouTube videos of the original creator:
 Original Creator's Initial video: https://www.youtube.com/watch?v=boTzMxNn7UE&t=0s
